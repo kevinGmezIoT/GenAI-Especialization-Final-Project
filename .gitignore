@@ -1,0 +1,29 @@
+# Python
+__pycache__/
+notebooks/
+*.pyc
+*.pyo
+*.pyd
+*.ipynb
+.Python
+env/
+venv/
+.env
+.venv
+env.bak/
+venv.bak/
+
+# DVC
+/data/
+/models/
+.dvc/config.local
+.dvc/tmp
+.dvc/cache
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db

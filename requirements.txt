@@ -1,0 +1,11 @@
+streamlit
+scikit-learn
+pandas
+joblib
+pytest
+boto3
+langchain
+langchain-aws
+langchain-community
+dvc
+dvc-s3
