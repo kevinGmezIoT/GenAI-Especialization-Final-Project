@@ -1,9 +1,7 @@
 # Excluir archivos y carpetas del control de DVC
 models/trained/*.pkl
-models/trained/*.joblib
 models/experiments/
 data/raw/*.csv
-data/processed/*.csv
 data/toTrain/*.csv
 logs/
 monitoring/

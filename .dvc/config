@@ -1,4 +1,4 @@
 [core]
     analytics = false
 [remote "storage"]
-    url = .dvc/cache
+    url = s3://ia-fieecs-final-data/dvcstore
