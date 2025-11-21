@@ -91,6 +91,8 @@ Los notebooks y archivos relacionados están disponibles en el siguiente reposit
 
 ### Archivos de Datos:
 
+> **Nota:** Los archivos de datos y modelos no se encuentran directamente en el repositorio debido a su tamaño. Se gestionan mediante **DVC (Data Version Control)** y se almacenan en un bucket público de S3. Siga las instrucciones de instalación para descargarlos.
+
 - `data/raw/credit_risk_reto.csv`: Dataset inicial.
 - `data/processed/credit_risk_reto_preprocessed.csv`: Dataset con valores nulos rellenados.
 - `data/processed/output_description.csv`: Descripciones generadas por el LLM.
@@ -98,6 +100,11 @@ Los notebooks y archivos relacionados están disponibles en el siguiente reposit
 - `data/toTrain/test-V-1.csv`: Dataset de prueba.
 - `data/toTrain/train-V-1.csv`: Dataset de entrenamiento.
 
+## Gestión de Datos
+
+Este proyecto utiliza **DVC** para el versionado de datos y modelos.
+- Los archivos `.dvc` que rastrean las versiones se encuentran en la carpeta `dvc/`.
+- El almacenamiento remoto es un bucket público de S3: `s3://ia-fieecs-final-data/dvcstore`.
 
 ## Conclusiones
 
@@ -116,7 +123,14 @@ Este proyecto demuestra cómo los servicios en la nube de AWS pueden integrarse 
    pip install -r requirements.txt
    ```
 
-3. **Ejecutar los notebooks:**
+3. **Descargar datos y modelos:**
+   Como el bucket de S3 es público, puede descargar todos los datos necesarios ejecutando:
+   ```bash
+   dvc pull
+   ```
+   *Esto leerá los archivos `.dvc` de la carpeta `dvc/` y descargará los datos correspondientes en `data/` y `models/`.*
+
+4. **Ejecutar los notebooks:**
    Abra los notebooks en un entorno como JupyterLab o VSCode y ejecute las celdas en orden.
 
 ## Contacto
