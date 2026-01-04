@@ -14,7 +14,7 @@ env.bak/
 venv.bak/
 
 # DVC
-/data/
+# /data/
 /models/
 .dvc/config.local
 .dvc/tmp

@@ -26,18 +26,6 @@ jobs:
           pip install -r requirements.txt
           pip install "dvc[s3]"
 
-      - name: Pull data from DVC
-        env:
-          AWS_ACCESS_KEY_ID: "testing"
-          AWS_SECRET_ACCESS_KEY: "testing"
-          AWS_DEFAULT_REGION: "us-east-1"
-          AWS_NO_SIGN_REQUEST: "YES"
-        run: |
-          # Manually inject anonymous access config to bypass validation errors
-          sed -i '/\[remote "storage"\]/a \    no_sign_request = true' .dvc/config
-          # Use -r to force usage of the 'storage' remote for the specific dvc file
-          dvc pull -r storage dvc/output_target.csv.dvc
-
       - name: Train model
         run: |
           python src/models/train.py
