@@ -26,10 +26,8 @@ jobs:
           pip install -r requirements.txt
 
       - name: Pull data from DVC
-        env:
-          AWS_NO_SIGN_REQUEST: "YES"
         run: |
-          dvc remote default storage
+          dvc remote modify storage no_sign_request true
           dvc pull data/processed/output_target.csv
 
       - name: Train model
