@@ -36,6 +36,6 @@ jobs:
         run: |
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git config --global user.name "github-actions[bot]"
-          git add -f models/credit_risk_model.joblib
-          git commit -m "Auto-train: add model file" || echo "No changes to commit"
+          git add -f models/credit_risk_model.joblib data/processed/train_features.csv
+          git commit -m "Auto-train: add model and baseline features" || echo "No changes to commit"
           git push --force https://Kiot:$HF_TOKEN@huggingface.co/spaces/Kiot/final-fieecs-ia master:main
