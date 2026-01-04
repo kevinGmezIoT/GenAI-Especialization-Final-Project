@@ -4,7 +4,7 @@ import os
 from langchain_aws import ChatBedrock
 from langchain_core.prompts import PromptTemplate
 
-def add_description(data, model_id="amazon.titan-text-premier-v1:0", profile_name="bedrock-user-admin"):
+def add_description(data, model_id="amazon.titan-text-express-v1", profile_name="bedrock-user-admin"):
     print("Generating descriptions...")
     try:
         llm = ChatBedrock(
