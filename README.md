@@ -145,4 +145,4 @@ Este proyecto demuestra cómo los servicios en la nube de AWS pueden integrarse 
 
 ## Contacto
 
-Si tienes dudas o sugerencias, puedes contactarme en: [kevin.gomez.villanueva.uni@outlook.com](mailto:kevin.gomez.villanueva.uni@outlook.com)
+Si tienes dudas o sugerencias, puedes contactarme en: [kevin.gomez.villanueva.uni@outlook.com](mailto:kevin.gomez.villanueva.uni@outlook.com).
