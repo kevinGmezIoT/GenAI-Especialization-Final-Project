@@ -3,10 +3,16 @@ import pandas as pd
 import os
 import sys
 
+# Enable LangSmith Tracing
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
+
 # Add src to path to ensure modules can be imported
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
 from models.predict import load_model, make_prediction
+
+# Enable LangSmith Tracing
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
 # Page config
 st.set_page_config(
@@ -71,13 +77,18 @@ else:
             }
             
             try:
-                # Import here to ensure environment is set up if needed
+                from langsmith import traceable
                 from models.enrich_inference import generate_inference_description
                 
+                # Wrap the whole flow for tracing
+                @traceable(name="Streamlit Assessment")
+                def predict_flow(data):
+                    desc = generate_inference_description(data)
+                    pred, prob = make_prediction(model, data)
+                    return pred, prob, desc
+
                 with st.spinner("Analyzing profile..."):
-                    description = generate_inference_description(input_data)
-                
-                prediction, probability = make_prediction(model, input_data)
+                    prediction, probability, description = predict_flow(input_data)
                 
                 st.divider()
                 st.subheader("Assessment Result")

@@ -3,6 +3,9 @@ from pydantic import BaseModel, Field
 from typing import Literal
 import asyncio
 import os
+
+# Enable LangChain/LangSmith Tracing
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
 import sys
 
 # Add src to path
@@ -10,9 +13,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
 from models.predict import load_model, make_prediction
 from models.enrich_inference import generate_inference_description
+from langsmith import traceable
 
-# LangChain/LangSmith Tracing
-os.environ["LANGCHAIN_TRACING_V2"] = "true"
+@traceable(name="Credit Risk Assessment")
+def run_assessment_logic(model, input_data):
+    # 1. Generate Description via LangChain
+    description = generate_inference_description(input_data)
+    
+    # 2. ML Inference
+    prediction, probability = make_prediction(model, input_data)
+    
+    return prediction, probability, description
 
 # ============================================================
 # 1. Request schema (respeta claves con espacios)
@@ -87,14 +98,10 @@ async def call_model(request: ModelRequest):
 
     try:
         # User input data (respecting the spaces in keys for the model)
-        # We use .model_dump() with by_alias=True to get the keys with spaces
         input_data = request.model_dump(by_alias=True)
         
-        # 1. Generate Description via LangChain (Traceable)
-        description = generate_inference_description(input_data)
-        
-        # 2. Inference
-        prediction, probability = make_prediction(model, input_data)
+        # Unified flow with LangSmith tracing
+        prediction, probability, description = run_assessment_logic(model, input_data)
 
         return ModelResponse(
             prediction_label=prediction.lower().strip(),
