@@ -28,9 +28,12 @@ jobs:
 
       - name: Pull data from DVC
         env:
+          AWS_ACCESS_KEY_ID: "testing"
+          AWS_SECRET_ACCESS_KEY: "testing"
           AWS_NO_SIGN_REQUEST: "YES"
         run: |
           dvc remote add -d -f storage s3://ia-fieecs-final-data/dvcstore
+          dvc config remote.storage.no_sign_request true
           dvc pull data/processed/output_target.csv
 
       - name: Train model
