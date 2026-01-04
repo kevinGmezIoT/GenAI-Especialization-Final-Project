@@ -1,3 +1,13 @@
+---
+title: Credit Risk Model API
+emoji: 🏦
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 7860
+pinned: false
+---
+
 # Clasificación de Riesgo Crediticio en Clientes Bancarios
 
 ## Autor
