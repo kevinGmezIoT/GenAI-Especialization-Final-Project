@@ -25,6 +25,9 @@ jobs:
           python -m pip install --upgrade pip
           pip install -r requirements.txt
 
+      - name: Pull data from DVC
+        run: dvc pull
+
       - name: Train model
         run: |
           python src/models/train.py
