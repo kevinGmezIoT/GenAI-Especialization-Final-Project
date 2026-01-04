@@ -24,10 +24,13 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
+          pip install "dvc[s3]"
 
       - name: Pull data from DVC
+        env:
+          AWS_NO_SIGN_REQUEST: "YES"
         run: |
-          dvc remote modify storage no_sign_request true
+          dvc remote add -d -f storage s3://ia-fieecs-final-data/dvcstore
           dvc pull data/processed/output_target.csv
 
       - name: Train model
