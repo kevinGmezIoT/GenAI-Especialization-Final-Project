@@ -18,6 +18,10 @@ RUN rm /etc/nginx/nginx.conf
 COPY nginx.conf /etc/nginx/nginx.conf
 RUN chmod +x start.sh
 
+# Required secrets for LangSmith (set in HF Space settings):
+# LANGCHAIN_API_KEY
+# LANGCHAIN_PROJECT
+
 EXPOSE 7860
 
 CMD ["./start.sh"]

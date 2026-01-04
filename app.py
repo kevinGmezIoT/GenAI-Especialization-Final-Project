@@ -71,10 +71,19 @@ else:
             }
             
             try:
+                # Import here to ensure environment is set up if needed
+                from models.enrich_inference import generate_inference_description
+                
+                with st.spinner("Analyzing profile..."):
+                    description = generate_inference_description(input_data)
+                
                 prediction, probability = make_prediction(model, input_data)
                 
                 st.divider()
                 st.subheader("Assessment Result")
+                
+                # Show description
+                st.info(f"**Customer Profile Analysis:**\n\n{description}")
                 
                 if prediction == "Good Risk":
                     st.success(f"✅ **Good Risk**")

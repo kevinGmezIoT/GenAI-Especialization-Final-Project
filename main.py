@@ -9,6 +9,10 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
 from models.predict import load_model, make_prediction
+from models.enrich_inference import generate_inference_description
+
+# LangChain/LangSmith Tracing
+os.environ["LANGCHAIN_TRACING_V2"] = "true"
 
 # ============================================================
 # 1. Request schema (respeta claves con espacios)
@@ -38,6 +42,7 @@ class ModelRequest(BaseModel):
 class ModelResponse(BaseModel):
     prediction_label: Literal["good risk", "bad risk"]
     probability: float
+    description: str
 
 
 # ============================================================
@@ -85,12 +90,16 @@ async def call_model(request: ModelRequest):
         # We use .model_dump() with by_alias=True to get the keys with spaces
         input_data = request.model_dump(by_alias=True)
         
-        # Inference
+        # 1. Generate Description via LangChain (Traceable)
+        description = generate_inference_description(input_data)
+        
+        # 2. Inference
         prediction, probability = make_prediction(model, input_data)
 
         return ModelResponse(
-            prediction_label=prediction.lower(),
-            probability=round(probability, 2)
+            prediction_label=prediction.lower().strip(),
+            probability=round(probability, 2),
+            description=description
         )
 
     except Exception as e:
