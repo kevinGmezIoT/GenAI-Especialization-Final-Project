@@ -25,11 +25,10 @@ class ModelRequest(BaseModel):
     Duration: int
     Purpose: str
 
-    class Config:
-        populate_by_name = True
-        # allow_population_by_field_name is for Pydantic v1, populate_by_name for v2
-        # Adding both for compatibility if needed, but modern FastAPI uses pydantic v2
-        extra = "ignore"
+    model_config = {
+        "populate_by_name": True,
+        "extra": "ignore"
+    }
 
 
 # ============================================================
