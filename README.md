@@ -34,19 +34,19 @@ El sistema automatiza la evaluación de riesgo para solicitantes de crédito, ap
 
 ```mermaid
 graph TD
-    User((Usuario/App)) -->|Request CLI/Web| Nginx[Nginx Reverse Proxy]
-    Nginx -->|Route /| Streamlit[Streamlit UI]
-    Nginx -->|Route /call_model| FastAPI[FastAPI Backend]
+    User(("Usuario/App")) -->|Request CLI/Web| Nginx["Nginx Reverse Proxy"]
+    Nginx -->|Route /| Streamlit["Streamlit UI"]
+    Nginx -->|Route /call_model| FastAPI["FastAPI Backend"]
     
     subgraph "Intelligent Core"
-        FastAPI -->|1. Generate Context| LangChain[LangChain + AWS Bedrock]
-        LangChain -->|Tracing| LangSmith[LangSmith Monitoring]
-        FastAPI -->|2. Predict| MLModel[SVM Risk Model]
+        FastAPI -->|"1. Generate Context"| LangChain["LangChain + AWS Bedrock"]
+        LangChain -->|Tracing| LangSmith["LangSmith Monitoring"]
+        FastAPI -->|"2. Predict"| MLModel["SVM Risk Model"]
     end
     
     subgraph "Production Monitoring"
-        FastAPI -->|Log Inference| Logs[(JSON Logs)]
-        Logs -->|PSI Analysis| DriftAPI[/monitoring endpoint]
+        FastAPI -->|"Log Inference"| Logs[("JSON Logs")]
+        Logs -->|"PSI Analysis"| DriftAPI["/monitoring endpoint"]
     end
 ```
 
