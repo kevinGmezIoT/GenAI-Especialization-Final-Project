@@ -61,6 +61,16 @@ async def startup_event():
     else:
         print(f"Warning: Model not found at {model_path}")
 
+@app.get("/")
+async def root():
+    return {
+        "message": "Credit Risk Model API is running",
+        "endpoints": {
+            "prediction": "/call_model (POST)",
+            "documentation": "/docs"
+        }
+    }
+
 # ============================================================
 # 4. Endpoint único solicitado
 # ============================================================
