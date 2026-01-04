@@ -8,141 +8,122 @@ app_port: 7860
 pinned: false
 ---
 
-# Clasificación de Riesgo Crediticio en Clientes Bancarios
+# 🏦 End-to-End Credit Risk Intelligence System
 
-## Autor
-Kevin Gómez Villanueva
-
-## Fecha
-20 de noviembre de 2025
+Este proyecto representa una solución integral de **MLOps** para la evaluación de riesgo crediticio, integrando inteligencia artificial generativa (GenAI), aprendizaje automático tradicional y sistemas avanzados de monitoreo en producción.
 
 ---
 
-## Resumen Ejecutivo
+## 🚀 Descripción del Proyecto
 
-Este proyecto implementa un pipeline de Machine Learning para la clasificación de riesgo crediticio en clientes bancarios, utilizando servicios de AWS como Sagemaker y Bedrock. El pipeline abarca:
+El sistema automatiza la evaluación de riesgo para solicitantes de crédito, aportando dos capas de inteligencia:
+1.  **Capa Predictiva (ML)**: Determina si un cliente es de "Buen" o "Mal" riesgo usando un modelo SVM.
+2.  **Capa Generativa (GenAI)**: Proporciona un análisis narrativo del perfil del cliente en lenguaje natural, actuando como un "asistente de riesgos".
 
-- **Etiquetado automático de datos** mediante Modelos Grandes de Lenguaje (LLM).
-- **Entrenamiento de modelos** de clasificación usando Support Vector Machine.
-- **Despliegue del modelo** en un endpoint de Sagemaker para realizar inferencias en tiempo real.
-
-## Índice
-
-1. [Introducción](#introducción)
-2. [Objetivos](#objetivos)
-3. [Metodología](#metodología)
-4. [Desarrollo](#desarrollo)
-5. [Conclusiones](#conclusiones)
+### 🛠 Tech Stack
+- **Backend**: FastAPI (Python)
+- **Frontend**: Streamlit
+- **GenAI/Observability**: LangChain, LangSmith, AWS Bedrock (Titan Express)
+- **ML Core**: Scikit-Learn (SVC), Pandas, Joblib
+- **DevOps**: Docker, Nginx, GitHub Actions
+- **Monitoring**: PSI (Population Stability Index) para detección de Drift.
 
 ---
 
-## Introducción
+## 🏗 Arquitectura del Sistema
 
-La clasificación de riesgo crediticio es un análisis crucial que ayuda a las instituciones financieras a evaluar la probabilidad de incumplimiento por parte de los clientes. Este proyecto busca optimizar dicho proceso mediante el uso de herramientas avanzadas de Machine Learning y servicios en la nube.
+```mermaid
+graph TD
+    User((Usuario/App)) -->|Request CLI/Web| Nginx[Nginx Reverse Proxy]
+    Nginx -->|Route /| Streamlit[Streamlit UI]
+    Nginx -->|Route /call_model| FastAPI[FastAPI Backend]
+    
+    subgraph "Intelligent Core"
+        FastAPI -->|1. Generate Context| LangChain[LangChain + AWS Bedrock]
+        LangChain -->|Tracing| LangSmith[LangSmith Monitoring]
+        FastAPI -->|2. Predict| MLModel[SVM Risk Model]
+    end
+    
+    subgraph "Production Monitoring"
+        FastAPI -->|Log Inference| Logs[(JSON Logs)]
+        Logs -->|PSI Analysis| DriftAPI[/monitoring endpoint]
+    end
+```
 
-## Objetivos
+---
 
-### Objetivo General
-Determinar el nivel de riesgo crediticio de un cliente bancario a partir de sus datos.
+## 📊 Datos y Enriquecimiento
 
-### Objetivos Específicos
+### Dataset Original
+Se basa en el conjunto de datos de riesgo crediticio alemán, que incluye variables como:
+- **Demográficas**: Edad (Age), Sexo (Sex).
+- **Financieras**: Cuentas de ahorro (Saving accounts), Cuenta corriente (Checking account), Monto (Credit amount).
+- **Contextuales**: Finalidad (Purpose), Duración (Duration).
 
-- Utilizar AWS Bedrock para elaborar descripciones detalladas del perfil del cliente y etiquetar los datos automáticamente.
-- Entrenar y desplegar un modelo eficiente en AWS Sagemaker.
+### Enriquecimiento con GenAI (LangChain)
+Antes de la predicción, el sistema envía los datos a **AWS Bedrock**. LangChain orquesta este flujo para generar una descripción de máximo 30 palabras que resume el perfil del cliente desde la perspectiva de un experto bancario. Todas estas llamadas se monitorean en **LangSmith** para evaluar latencia y calidad del prompt.
 
-## Metodología
+---
 
-### Base de Datos
+## 📉 Monitoreo de Producción (MLOps)
 
-Se utilizó el archivo `credit_risk_reto.csv`, que contiene 1000 entradas con las siguientes columnas:
+El sistema incluye una suite de monitoreo profesional diseñada para entornos bancarios:
 
-- **Age**: Edad del cliente
-- **Sex**: Sexo del cliente
-- **Job**: Nivel de habilidad laboral (0-3)
-- **Housing**: Tipo de alojamiento
-- **Saving accounts**: Tipo de cuenta de ahorro
-- **Checking account**: Tipo de cuenta corriente
-- **Credit amount**: Monto de crédito solicitado
-- **Duration**: Duración del préstamo (en meses)
-- **Purpose**: Motivo del préstamo
+### 1. Population Stability Index (PSI)
+Calculamos el PSI para detectar **Data Drift**. Comparamos los histogramas de las variables en producción contra la línea base del entrenamiento:
+- **PSI < 0.1**: Estable ✅
+- **0.1 - 0.2**: Alerta de cambio ⚠️
+- **PSI > 0.2**: Drift detectado (requiere re-entrenamiento) 🚨
 
-### Etapas del Pipeline
+### 2. Prediction Drift
+Monitorea cambios en la tasa de "Bad Risk" generada por el modelo para detectar cambios inesperados en las aprobaciones de crédito.
 
-1. **Análisis Exploratorio de Datos (EDA):**
-   - Identificación de datos faltantes y desbalanceo de clases.
+---
 
-2. **Etiquetado Automático de Datos:**
-   - Uso de AWS Bedrock con modelos como `amazon.titan-text-premier-v1` para generar descripciones detalladas de riesgo.
+## 📦 Instalación y Ejecución
 
-3. **Preprocesamiento:**
-   - Normalización de datos y preparación para entrenamiento.
+### 💻 Localmente
+1.  **Clonar y Entorno**:
+    ```bash
+    git clone https://github.com/kevinGmezIoT/credit-risk-reto.git
+    cd credit-risk-reto
+    pip install -r requirements.txt
+    ```
+2.  **Entrenar el Modelo**:
+    ```bash
+    python src/models/train.py
+    ```
+3.  **Lanzar Servicios** (Requiere 2 terminales):
+    - `uvicorn main:app --port 8000` (API)
+    - `streamlit run app.py` (Web)
 
-3. **Entrenamiento de Modelos:**
-   - Entrenamiento con diferentes algoritmos de clasificación y selección del mejor modelo basado en métricas de desempeño.
+### 🐳 Docker (Recomendado)
+El proyecto usa Nginx como proxy para servir ambos servicios en el puerto `7860`.
+```bash
+docker build -t credit-risk-app .
+docker run -p 7860:7860 --env-file .env credit-risk-app
+```
 
-4. **Despliegue:**
-   - Implementación del modelo seleccionado en un endpoint de Sagemaker.
+---
 
-5. **Inferencia:**
-   - Uso del endpoint para clasificar nuevos datos en tiempo real.
+## 🚢 Despliegue CI/CD
 
-## Desarrollo
+El despliegue está automatizado con **GitHub Actions**:
+1.  **Continuous Training**: Cada vez que haces un `push` a `master`, el workflow entrena el modelo de nuevo con los últimos datos proporcionados.
+2.  **Versioning**: Sube el modelo (`.joblib`) y la línea base (`train_features.csv`) a Hugging Face Spaces.
+3.  **Dockerization**: Construye y despliega el contenedor en Hugging Face automáticamente.
 
-Los notebooks y archivos relacionados están disponibles en el siguiente repositorio de GitHub:
-[Repositorio del Proyecto](https://github.com/kevinGmezIoT/credit-risk-reto)
+### 🔐 Secretos Necesarios (En HF/GitHub)
+- `HF_TOKEN`: Para el despliegue.
+- `LANGCHAIN_API_KEY`: Para monitoreo de GenAI.
+- `AWS_ACCESS_KEY_ID` / `AWS_SECRET_ACCESS_KEY`: Para conectarse a Bedrock.
 
-### Notebooks Incluidos:
+---
 
-1. **EDA y Preprocesamiento:** Exploración de datos inicial y preparación del dataset.
-2. **Etiquetado Automático:** Código para la generación de descripciones usando LLM.
-3. **Entrenamiento:** Implementación de modelos de Machine Learning y optimización de hiperparámetros.
-4. **Despliegue:** Configuración del endpoint en AWS Sagemaker.
-5. **Inferencia:** Pruebas y validación del modelo en producción.
+## 🔗 Enlaces de Verificación en Producción
+- **Interfaz Web**: [Tu Space URL]
+- **API Swagger**: `[URL]/docs`
+- **Dashboard de Salud**: `[URL]/monitoring`
 
-### Archivos de Datos:
-
-> **Nota:** Los archivos de datos y modelos no se encuentran directamente en el repositorio debido a su tamaño. Se gestionan mediante **DVC (Data Version Control)** y se almacenan en un bucket público de S3. Siga las instrucciones de instalación para descargarlos.
-
-- `data/raw/credit_risk_reto.csv`: Dataset inicial.
-- `data/processed/credit_risk_reto_preprocessed.csv`: Dataset con valores nulos rellenados.
-- `data/processed/output_description.csv`: Descripciones generadas por el LLM.
-- `data/processed/output_target.csv`: Clasificación generada por el LLM.
-- `data/toTrain/test-V-1.csv`: Dataset de prueba.
-- `data/toTrain/train-V-1.csv`: Dataset de entrenamiento.
-
-## Gestión de Datos
-
-Este proyecto utiliza **DVC** para el versionado de datos y modelos.
-- Los archivos `.dvc` que rastrean las versiones se encuentran en la carpeta `dvc/`.
-- El almacenamiento remoto es un bucket público de S3: `s3://ia-fieecs-final-data/dvcstore`.
-
-## Conclusiones
-
-Este proyecto demuestra cómo los servicios en la nube de AWS pueden integrarse para resolver problemas complejos en el sector financiero. El pipeline desarrollado puede adaptarse y escalarse según las necesidades de instituciones bancarias.
-
-## Instalación y Ejecución
-
-1. **Clonar el repositorio:**
-   ```bash
-   git clone https://github.com/kevinGmezIoT/credit-risk-reto.git
-   cd credit-risk-reto
-   ```
-
-2. **Instalar dependencias:**
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-3. **Descargar datos y modelos:**
-   Como el bucket de S3 es público, puede descargar todos los datos necesarios ejecutando:
-   ```bash
-   dvc pull
-   ```
-   *Esto leerá los archivos `.dvc` de la carpeta `dvc/` y descargará los datos correspondientes en `data/` y `models/`.*
-
-4. **Ejecutar los notebooks:**
-   Abra los notebooks en un entorno como JupyterLab o VSCode y ejecute las celdas en orden.
-
-## Contacto
-
-Si tienes dudas o sugerencias, puedes contactarme en: [kevin.gomez.villanueva.uni@outlook.com](mailto:kevin.gomez.villanueva.uni@outlook.com).
+---
+**Kevin Gómez Villanueva** | Proyecto Final de Especialización en GenAI
