@@ -13,6 +13,8 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), 'src')))
 
 from models.predict import load_model, make_prediction
 from models.enrich_inference import generate_inference_description
+from monitoring.logger import log_inference
+from monitoring.run_monitoring import run_monitoring_suite
 from langsmith import traceable
 
 @traceable(name="Credit Risk Assessment")
@@ -83,9 +85,18 @@ async def root():
         "message": "Credit Risk Model API is running",
         "endpoints": {
             "prediction": "/call_model (POST)",
+            "monitoring": "/monitoring (GET)",
             "documentation": "/docs"
         }
     }
+
+@app.get("/monitoring")
+async def get_monitoring_report():
+    """
+    Returns the current data and prediction drift report.
+    """
+    report = run_monitoring_suite()
+    return report
 
 # ============================================================
 # 4. Endpoint único solicitado
@@ -102,6 +113,9 @@ async def call_model(request: ModelRequest):
         
         # Unified flow with LangSmith tracing
         prediction, probability, description = run_assessment_logic(model, input_data)
+
+        # 3. Log for Monitoring (Drift detection)
+        log_inference(input_data, prediction)
 
         return ModelResponse(
             prediction_label=prediction.lower().strip(),

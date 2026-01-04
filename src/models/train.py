@@ -56,6 +56,11 @@ def train_model(data_path, model_path):
     print("Training model...")
     model.fit(X_train, y_train)
     
+    # Save training features as baseline for monitoring (Drift detection)
+    baseline_path = os.path.join(os.path.dirname(data_path), "train_features.csv")
+    X_train.to_csv(baseline_path, index=False)
+    print(f"Baseline features saved to {baseline_path}")
+
     # Evaluate
     print("Evaluating model...")
     y_pred = model.predict(X_test)

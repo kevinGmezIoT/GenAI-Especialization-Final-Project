@@ -79,12 +79,15 @@ else:
             try:
                 from langsmith import traceable
                 from models.enrich_inference import generate_inference_description
+                from monitoring.logger import log_inference
                 
                 # Wrap the whole flow for tracing
                 @traceable(name="Streamlit Assessment")
                 def predict_flow(data):
                     desc = generate_inference_description(data)
                     pred, prob = make_prediction(model, data)
+                    # Log for monitoring
+                    log_inference(data, pred)
                     return pred, prob, desc
 
                 with st.spinner("Analyzing profile..."):
