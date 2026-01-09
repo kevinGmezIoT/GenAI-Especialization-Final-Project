@@ -4,7 +4,7 @@ from langchain_core.prompts import PromptTemplate
 from langsmith import traceable
 
 @traceable(name="Generate Customer Description")
-def generate_inference_description(input_data: dict, model_id="amazon.titan-text-express-v1"):
+def generate_inference_description(input_data: dict, model_id="amazon.nova-lite-v1:0"):
     """
     Generates a brief description of the customer using an LLM.
     """

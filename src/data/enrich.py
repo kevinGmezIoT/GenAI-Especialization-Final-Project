@@ -4,7 +4,7 @@ import os
 from langchain_aws import ChatBedrock
 from langchain_core.prompts import PromptTemplate
 
-def add_description(data, model_id="amazon.titan-text-express-v1", profile_name="bedrock-user-admin"):
+def add_description(data, model_id="amazon.nova-lite-v1:0", profile_name="bedrock-user-admin"):
     print("Generating descriptions...")
     try:
         llm = ChatBedrock(
@@ -64,7 +64,7 @@ def add_description(data, model_id="amazon.titan-text-express-v1", profile_name=
             })
             classification = llm.invoke(input=result)
             results.append(classification.content)
-            # Rate limiting/Sleep to avoid throttling if necessary, though Titan is usually fast.
+            # Rate limiting/Sleep to avoid throttling if necessary, though Nova is usually fast.
             # time.sleep(0.5) 
         except Exception as e:
             print(f"Error processing row {index}: {e}")
